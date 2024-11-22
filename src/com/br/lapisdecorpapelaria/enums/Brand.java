@@ -1,6 +1,6 @@
 package com.br.lapisdecorpapelaria.enums;
 public enum Brand {
-	JANDAIA("Jandaia"), CREDEAL("Credeal");
+	JANDAIA("Jandaia"), FORONI("Foroni"), CREDEAL("Credeal");
 	
 	public String value;
 	
