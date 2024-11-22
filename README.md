@@ -4,3 +4,4 @@ Features próximas:
  - Baixar imagens dos cadernos via URL automaticamente.
  - Formatar descrições de cadernos do website da Tilibra.
  - Design mais moderno.
+ - Conversão para projeto Maven.
