@@ -12,6 +12,14 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+
 public class DescGen extends JFrame {
 
     private JComboBox<Brand> brandComboBox;
@@ -21,11 +29,14 @@ public class DescGen extends JFrame {
     private JTextArea outputArea;
     private JButton generateButton;
     private JButton copyButton;
+    private JTextField folderPathField;  // Novo JTextField para o caminho da pasta
+    private JButton selectFolderButton;  // Novo JButton para abrir o JFileChooser
 
     private Brand brand = Brand.JANDAIA;
     private BookType bookType = BookType.BROCHURA;
     private boolean sortido = true;
     private String title = "CADERNO BROCHURAO UNIVERSITARIO CAPA DURA BLABLA 96FLS";
+    private String imagesPath = "";  // Nova string para armazenar o caminho da pasta selecionada
 
     private int folhas = 0;
     private int materias = 0;
@@ -43,7 +54,7 @@ public class DescGen extends JFrame {
 
         // Painel de entrada com layout moderno
         JPanel inputPanel = new JPanel();
-        inputPanel.setLayout(new GridLayout(5, 2, 10, 10));
+        inputPanel.setLayout(new GridLayout(6, 2, 10, 10));  // Mudamos para 6 linhas
         inputPanel.setBackground(new Color(45, 45, 45));  // Tema escuro
         inputPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -75,8 +86,64 @@ public class DescGen extends JFrame {
         assortedCheckBox.setBackground(new Color(45, 45, 45));
         assortedCheckBox.setForeground(Color.WHITE);
         assortedCheckBox.setSelected(sortido);
+        assortedCheckBox.setCursor(new Cursor(Cursor.HAND_CURSOR));
         assortedCheckBox.setFont(new Font("Segoe UI", Font.PLAIN, 18)); // Aumentando o tamanho da fonte do checkbox
         inputPanel.add(assortedCheckBox);
+
+        // Novo campo para selecionar pasta
+        inputPanel.add(createLabel("Image Path (caso não queira, deixe em branco):"));
+        JPanel folderPanel = new JPanel(new BorderLayout());
+        folderPanel.setBackground(new Color(45, 45, 45));
+
+        folderPathField = new JTextField();
+        folderPathField.setFont(new Font("Arial", Font.PLAIN, 13));
+        folderPathField.setBackground(new Color(60, 63, 65));  // Caixa de texto com fundo escuro
+        folderPathField.setForeground(Color.WHITE);  // Texto claro
+        folderPathField.setCaretColor(Color.WHITE);  // Cor do cursor
+        folderPathField.setPreferredSize(new Dimension(400, 40));  // Ajuste no tamanho
+        folderPanel.add(folderPathField, BorderLayout.CENTER);
+
+        // Botão para selecionar a pasta
+        selectFolderButton = new JButton();
+        selectFolderButton.setBackground(Color.RED);  // Cor vermelha
+        selectFolderButton.setForeground(Color.WHITE);
+        selectFolderButton.setPreferredSize(new Dimension(40, 40));  // Botão quadrado (1:1)
+        ImageIcon icon = new ImageIcon("C:/Users/User/Desktop/Elias/search-icon.png");
+        selectFolderButton.setIcon(icon);  // Ícone de "procurar"
+        selectFolderButton.setBorderPainted(false);
+        selectFolderButton.setFocusPainted(false);
+        selectFolderButton.setContentAreaFilled(true);
+        selectFolderButton.setCursor(new Cursor(Cursor.HAND_CURSOR));  // Alterando o cursor para "pointer"
+
+        // Efeito de hover para mudar a cor de fundo
+        selectFolderButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                // Muda a cor de fundo para um vermelho escuro ao passar o mouse
+            	selectFolderButton.setBackground(new Color(180, 0, 0));  // Um tom de vermelho mais escuro
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                // Restaura a cor original do botão quando o mouse sai
+            	selectFolderButton.setBackground(Color.RED);
+            }
+        });
+        selectFolderButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser folderChooser = new JFileChooser();
+                folderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                int returnValue = folderChooser.showOpenDialog(null);
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                    File selectedFolder = folderChooser.getSelectedFile();
+                    folderPathField.setText(selectedFolder.getAbsolutePath());  // Atualiza o campo com o caminho da pasta
+                    imagesPath = selectedFolder.getAbsolutePath();  // Salva o caminho da pasta na variável imagesPath
+                }
+            }
+        });
+        folderPanel.add(selectFolderButton, BorderLayout.EAST);
+        inputPanel.add(folderPanel);
 
         // Botões com estilo moderno
         generateButton = createButton("Gerar Descrição", new Color(30, 160, 110), Color.WHITE);
@@ -111,6 +178,8 @@ public class DescGen extends JFrame {
                 bookType = (BookType) bookTypeComboBox.getSelectedItem();
                 sortido = assortedCheckBox.isSelected();
                 title = titleField.getText();
+                
+                // Aqui, o caminho da pasta é já salvo na variável imagesPath
                 generateDescription();
             }
         });
@@ -143,6 +212,9 @@ public class DescGen extends JFrame {
         }
 
         outputArea.setText(output.toString());
+
+        // Aqui você pode usar o caminho da pasta em imagesPath, se necessário, para salvar ou processar arquivos
+        System.out.println("Caminho da pasta selecionada: " + imagesPath);
     }
 
     // Método para definir o look and feel
